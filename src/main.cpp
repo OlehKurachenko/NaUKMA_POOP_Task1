@@ -35,6 +35,18 @@ int main(const int argc, const char **argv) {
     if (ifstream.is_open())
         ifstream >> p;
 
+    if (argc == 3 && argv[2] == std::string("list"))
+    {
+        if (NAUKMA_POOP_TASK1_PHONEBOOK_H_COLORED_OUTPUT)
+            cout << "\033[0;34m"; // blue
+        cout << "Listing all contacts:" << endl;
+        if (NAUKMA_POOP_TASK1_PHONEBOOK_H_COLORED_OUTPUT)
+            cout << "\033[0;0m"; // reset
+
+        for (const string &userName: p.listUsers())
+            verbosePrint(p.card(userName));
+    }
+
 //    p.addUser("Oleh Kurachenko");
 //    std::cerr << "All ok\n";
 //    p.addPhoneNumber("Oleh Kurachenko", "+380501656149");
@@ -42,8 +54,8 @@ int main(const int argc, const char **argv) {
 //    p.addPhoneNumber("Oleh Kurachenko", "5663830");
 //    std::cerr << "All ok\n";
 
-    p.addUser("Mr. Lololoshka");
-    p.addPhoneNumber("Mr. Lololoshka", "101");
+    //p.addUser("Mr. Lololoshka");
+    //p.addPhoneNumber("Mr. Lololoshka", "101");
 
     std::ofstream ofstream(argv[1], std::ofstream::out);
     ofstream << p;

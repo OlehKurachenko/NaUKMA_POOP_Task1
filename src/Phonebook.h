@@ -86,9 +86,11 @@ private:
     vector<string> _phones;
 };
 
+inline void verbosePrint(const Phonebook::Card &card);
+
 //  utills
 
-inline bool    phoneNumberIsValid(const string &phoneNumber); // TODO
+inline bool phoneNumberIsValid(const string &phoneNumber); // TODO
 
 //  class Phonebook definitions
 
@@ -175,6 +177,20 @@ inline void Phonebook::Card::addPhoneNumber(const string &phoneNumber) {
     if (std::find(this->_phones.begin(), this->_phones.end(), phoneNumber) != this->_phones.end())
         throw std::runtime_error("Phone number already in card");
     this->_phones.push_back(phoneNumber);
+}
+
+inline void verbosePrint(const Phonebook::Card &card) {
+    if (NAUKMA_POOP_TASK1_PHONEBOOK_H_COLORED_OUTPUT)
+        std::cout << "\033[0;36m"; // cyan
+    std::cout << "Person: ";
+    if (NAUKMA_POOP_TASK1_PHONEBOOK_H_COLORED_OUTPUT)
+        std::cout << "\033[1;36m"; // bold cyan
+    std::cout << card.userName() << std::endl;
+
+    for (const string &phoneNumber : card.listNumbers())
+        std::cout << "   " << phoneNumber << std::endl;
+    if (NAUKMA_POOP_TASK1_PHONEBOOK_H_COLORED_OUTPUT)
+        std::cout << "\033[0;0m"; // reset
 }
 
 //  utills definitions
