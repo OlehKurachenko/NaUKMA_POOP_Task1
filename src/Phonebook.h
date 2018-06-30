@@ -45,6 +45,8 @@ public:
 
     inline const vector<string> listUsers() const;
 
+    inline bool has(const string &userName) const;
+
     inline const Card &card(const string &userName) const;
 
     Phonebook(const Phonebook &) = delete;
@@ -97,7 +99,7 @@ inline bool phoneNumberIsValid(const string &phoneNumber); // TODO
 inline const Phonebook::Card &Phonebook::addUser(const string &userName) {
     if (userName.length() == 0)
         throw std::runtime_error("Bad user name");
-    if (this->_phonebook.find(userName) != this->_phonebook.end())
+    if (this->has(userName))
         throw std::runtime_error("User already exist");
     this->_phonebook.insert({userName, Phonebook::Card(userName)});
     return this->_phonebook.at(userName); //this->_phonebook[userName];
@@ -107,7 +109,7 @@ inline const Phonebook::Card &Phonebook::addPhoneNumber(const string &userName,
                                                         const string &phoneNumber) {
     if (userName.length() == 0)
         throw std::runtime_error("Bad user name");
-    if (this->_phonebook.find(userName) == this->_phonebook.end())
+    if (!this->has(userName))
         throw std::runtime_error("User does not exist");
     if (!phoneNumberIsValid(phoneNumber))
         throw std::runtime_error("Bad phone number");
@@ -123,10 +125,14 @@ inline const vector<string> Phonebook::listUsers() const {
     return usersList;
 }
 
+inline bool Phonebook::has(const string &userName) const {
+    return (this->_phonebook.find(userName) != this->_phonebook.end());
+}
+
 inline const Phonebook::Card &Phonebook::card(const string &userName) const {
     if (userName.length() == 0)
         throw std::runtime_error("Bad user name");
-    if (this->_phonebook.find(userName) == this->_phonebook.end())
+    if (!this->has(userName))
         throw std::runtime_error("User does not exist");
     return this->_phonebook.at(userName); //this->_phonebook[userName];
 }

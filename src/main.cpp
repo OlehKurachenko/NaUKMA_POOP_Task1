@@ -47,6 +47,37 @@ int main(const int argc, const char **argv) {
             verbosePrint(p.card(userName));
     }
 
+    if (argc == 5 && argv[2] == std::string("add"))
+    {
+        if (!p.has(argv[3])) {
+            try {
+                p.addUser(argv[3]);
+            } catch (std::runtime_error &err) {
+                if (NAUKMA_POOP_TASK1_PHONEBOOK_H_COLORED_OUTPUT)
+                    cout << "\033[1;31m"; // bold red
+                cout << err.what() << endl;
+                if (NAUKMA_POOP_TASK1_PHONEBOOK_H_COLORED_OUTPUT)
+                    cout << "\033[0;0m"; // reset
+                exit(0);
+            }
+        }
+        try {
+            const Phonebook::Card &card = p.addPhoneNumber(argv[3], argv[4]);
+            if (NAUKMA_POOP_TASK1_PHONEBOOK_H_COLORED_OUTPUT)
+                cout << "\033[0;34m"; // blue
+            cout << "New number added:" << endl;
+            if (NAUKMA_POOP_TASK1_PHONEBOOK_H_COLORED_OUTPUT)
+                cout << "\033[0;0m"; // reset
+            verbosePrint(card);
+        } catch (std::runtime_error &err) {
+            if (NAUKMA_POOP_TASK1_PHONEBOOK_H_COLORED_OUTPUT)
+                cout << "\033[1;31m"; // bold red
+            cout << err.what() << endl;
+            if (NAUKMA_POOP_TASK1_PHONEBOOK_H_COLORED_OUTPUT)
+                cout << "\033[0;0m"; // reset
+        }
+    }
+
 //    p.addUser("Oleh Kurachenko");
 //    std::cerr << "All ok\n";
 //    p.addPhoneNumber("Oleh Kurachenko", "+380501656149");
