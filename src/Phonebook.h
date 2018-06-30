@@ -135,26 +135,32 @@ inline ostream &operator<<(ostream &ostr, const Phonebook &phonebook)
     ostr << usersList.size() << std::endl;
     for (const string &userName: usersList) {
         const Phonebook::Card &userCard = phonebook.card(userName);
-        ostr << userCard.listNumbers().size() << ' ' << userCard.userName();
+        ostr << userCard.listNumbers().size() << std::endl << userCard.userName();
         for (const string &phoneNumber: userCard.listNumbers())
-            ostr << ' ' << phoneNumber;
+            ostr << std::endl << phoneNumber;
         ostr << std::endl;
     }
     return ostr;
 }
 
-//inline istream &operator>>(istream &istr, Phonebook &phonebook) {
-//    size_t  mapSize;
-//    size_t  listSize;
-//    string  nextName;
-//    string  nextPhoneNumber;
-//
-//    istr >> mapSize;
-//    for (size_t i{ 0 }; i < mapSize; ++i) {
-//        istr >> listSize;
-//
-//    }
-//}
+inline istream &operator>>(istream &istr, Phonebook &phonebook) {
+    size_t  mapSize;
+    size_t  listSize;
+    string  nextName;
+    string  nextPhoneNumber;
+
+    istr >> mapSize;
+    for (size_t i{ 0 }; i < mapSize; ++i) {
+        istr >> listSize;
+        getline(istr, nextName); // pass the end of line
+        getline(istr, nextName);
+        phonebook.addUser(nextName);
+        for (size_t j{ 0 }; j < listSize; ++j) {
+            getline(istr, nextPhoneNumber);
+            phonebook.addPhoneNumber(nextName, nextPhoneNumber);
+        }
+    }
+}
 
 //  class Phonebook::Card definitions
 
