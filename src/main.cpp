@@ -10,6 +10,8 @@
 
 #include <iostream>
 #include <fstream>
+
+#include "console_colors.h"
 #include "Phonebook.h"
 
 using std::cout;
@@ -17,15 +19,13 @@ using std::endl;
 
 int main(const int argc, const char **argv) {
     if (argc < 3) {
-        if (NAUKMA_POOP_TASK1_PHONEBOOK_H_COLORED_OUTPUT)
-            cout << "\033[0;34m"; // blue
+        cout << coloredPrint::BLUE;
         cout << "Usage:" << endl;
         cout << "   " << argv[0] << " file_name list : list all contacts" << endl;
         cout << "   " << argv[0]
              << " file_name add user_name phone_number : add phone_number to list of numbers of "
                 "user_name. If user_name does'n exist, it is being created" << endl;
-        if (NAUKMA_POOP_TASK1_PHONEBOOK_H_COLORED_OUTPUT)
-            cout << "\033[0;0m"; // reset
+        cout << coloredPrint::RESET;
         exit(0);
     }
 
@@ -35,58 +35,89 @@ int main(const int argc, const char **argv) {
     if (ifstream.is_open())
         ifstream >> p;
 
-    if (argc == 3 && argv[2] == std::string("list"))
+    if (argv[2] == std::string("list"))
     {
-        if (NAUKMA_POOP_TASK1_PHONEBOOK_H_COLORED_OUTPUT)
-            cout << "\033[0;34m"; // blue
-        cout << "Listing all contacts:" << endl;
-        if (NAUKMA_POOP_TASK1_PHONEBOOK_H_COLORED_OUTPUT)
-            cout << "\033[0;0m"; // reset
+        if (argc == 3) {
+            cout << coloredPrint::BLUE;
+            cout << "Listing all contacts:" << endl;
+            cout << coloredPrint::RESET;
 
-        for (const string &userName: p.listUsers())
-            verbosePrint(p.card(userName));
+            for (const string &userName: p.listUsers())
+                verbosePrint(p.card(userName));
+        }
+
+        if (argc == 4) {
+            if (p.has(argv[3])) {
+                verbosePrint(p.card(argv[3]));
+            } else {
+                cout << coloredPrint::BLUE;
+                cout << "No such person in contacts" << endl;
+                cout << coloredPrint::RESET;
+            }
+        }
     }
 
-    if (argc == 5 && argv[2] == std::string("add"))
+    if (argv[2] == std::string("add") && argc == 5)
     {
         if (!p.has(argv[3])) {
             try {
                 p.addUser(argv[3]);
             } catch (std::runtime_error &err) {
-                if (NAUKMA_POOP_TASK1_PHONEBOOK_H_COLORED_OUTPUT)
-                    cout << "\033[1;31m"; // bold red
+                cout << coloredPrint::BOLD_RED;
                 cout << err.what() << endl;
-                if (NAUKMA_POOP_TASK1_PHONEBOOK_H_COLORED_OUTPUT)
-                    cout << "\033[0;0m"; // reset
+                cout << coloredPrint::RESET;
                 exit(0);
             }
         }
         try {
             const Phonebook::Card &card = p.addPhoneNumber(argv[3], argv[4]);
-            if (NAUKMA_POOP_TASK1_PHONEBOOK_H_COLORED_OUTPUT)
-                cout << "\033[0;34m"; // blue
-            cout << "New number added:" << endl;
-            if (NAUKMA_POOP_TASK1_PHONEBOOK_H_COLORED_OUTPUT)
-                cout << "\033[0;0m"; // reset
+            cout << coloredPrint::BLUE;
+            cout << "Card updated:" << endl;
+            cout << coloredPrint::RESET;
             verbosePrint(card);
         } catch (std::runtime_error &err) {
-            if (NAUKMA_POOP_TASK1_PHONEBOOK_H_COLORED_OUTPUT)
-                cout << "\033[1;31m"; // bold red
+            cout << coloredPrint::BOLD_RED;
             cout << err.what() << endl;
-            if (NAUKMA_POOP_TASK1_PHONEBOOK_H_COLORED_OUTPUT)
-                cout << "\033[0;0m"; // reset
+            cout << coloredPrint::RESET;
         }
     }
 
-//    p.addUser("Oleh Kurachenko");
-//    std::cerr << "All ok\n";
-//    p.addPhoneNumber("Oleh Kurachenko", "+380501656149");
-//    std::cerr << "All ok\n";
-//    p.addPhoneNumber("Oleh Kurachenko", "5663830");
-//    std::cerr << "All ok\n";
+    if (argv[2] == std::string("remove")) {
+        if (argc == 4) {
+            try {
+                p.removeUser(argv[3]);
+            } catch (std::runtime_error &err) {
+                cout << coloredPrint::BOLD_RED;
+                cout << err.what() << endl;
+                cout << coloredPrint::RESET;
+            }
+        }
+        if (argc == 5) {
+            try {
+                const Phonebook::Card &card = p.removePhoneNumber(argv[3], argv[4]);
+                cout << coloredPrint::BLUE;
+                cout << "Card updated:" << endl;
+                cout << coloredPrint::RESET;
+                verbosePrint(card);
+            } catch (std::runtime_error &err) {
+                cout << coloredPrint::BOLD_RED;
+                cout << err.what() << endl;
+                cout << coloredPrint::RESET;
+            }
+        }
+    }
 
-    //p.addUser("Mr. Lololoshka");
-    //p.addPhoneNumber("Mr. Lololoshka", "101");
+    if (argv[2] == std::string("find") && argc == 4) {
+        bool found { false };
+        for (const Phonebook::Card &userCard: p.findByPhoneNumber(argv[3])) {
+            if (!found)
+                cout << coloredPrint::BLUE << "Persons found:" << endl << coloredPrint::RESET;
+            found = true;
+            verbosePrint(userCard);
+        }
+        if (!found)
+            cout << coloredPrint::BLUE << "Nothing found" << endl << coloredPrint::RESET;
+    }
 
     std::ofstream ofstream(argv[1], std::ofstream::out);
     ofstream << p;

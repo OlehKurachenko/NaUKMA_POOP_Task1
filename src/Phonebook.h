@@ -11,17 +11,13 @@
 #ifndef NAUKMA_POOP_TASK1_PHONEBOOK_H
 #define NAUKMA_POOP_TASK1_PHONEBOOK_H
 
-#if defined(unix) || defined(__unix__) || defined(__unix)
-# define NAUKMA_POOP_TASK1_PHONEBOOK_H_COLORED_OUTPUT true
-#else
-# define NAUKMA_POOP_TASK1_PHONEBOOK_H_COLORED_OUTPUT false
-#endif
-
 #include <iostream>
 #include <string>
 #include <map>
 #include <vector>
 #include <algorithm>
+
+#include "console_colors.h"
 
 using std::istream;
 using std::ostream;
@@ -41,7 +37,14 @@ public:
 
     inline const Card &addUser(const string &userName);
 
+    inline void removeUser(const string &userName);
+
     inline const Card &addPhoneNumber(const string &userName, const string &phoneNumber);
+
+    inline const Phonebook::Card &removePhoneNumber(const string &userName,
+                                                    const string &phoneNumber);
+
+    inline const vector<Card> findByPhoneNumber(const string &phoneNumber);
 
     inline const vector<string> listUsers() const;
 
@@ -76,6 +79,8 @@ public:
 
     inline void addPhoneNumber(const string &phoneNumber);
 
+    inline void removePhoneNumber(const string &phoneNumber);
+
     inline const vector<string> &listNumbers() const { return _phones; }
 
     inline const string userName() const { return _userName; }
@@ -92,7 +97,7 @@ inline void verbosePrint(const Phonebook::Card &card);
 
 //  utills
 
-inline bool phoneNumberIsValid(const string &phoneNumber); // TODO
+inline bool phoneNumberIsValid(const string &phoneNumber);
 
 //  class Phonebook definitions
 
@@ -135,6 +140,36 @@ inline const Phonebook::Card &Phonebook::card(const string &userName) const {
     if (!this->has(userName))
         throw std::runtime_error("User does not exist");
     return this->_phonebook.at(userName); //this->_phonebook[userName];
+}
+
+inline void Phonebook::removeUser(const string &userName) {
+    if (userName.length() == 0)
+        throw std::runtime_error("Bad user name");
+    if (!this->has(userName))
+        throw std::runtime_error("User does not exist");
+    this->_phonebook.erase(userName);
+}
+
+inline const Phonebook::Card &Phonebook::removePhoneNumber(const string &userName, const string &phoneNumber) {
+    if (userName.length() == 0)
+        throw std::runtime_error("Bad user name");
+    if (!this->has(userName))
+        throw std::runtime_error("User does not exist");
+    this->_phonebook.at(userName).removePhoneNumber(phoneNumber);
+    return this->_phonebook.at(userName);
+}
+
+inline const vector<Phonebook::Card> Phonebook::findByPhoneNumber(const string
+                                                                         &phoneNumber) {
+    vector<Phonebook::Card> found;
+    const vector<string> usersList = this->listUsers();
+    for (const string &userName: usersList) {
+        const Phonebook::Card &userCard = this->card(userName);
+        if (std::find(userCard.listNumbers().begin(), userCard.listNumbers().end(), phoneNumber) !=
+                userCard.listNumbers().end())
+            found.push_back(userCard);
+    }
+    return found;
 }
 
 inline ostream &operator<<(ostream &ostr, const Phonebook &phonebook)
@@ -183,6 +218,14 @@ inline void Phonebook::Card::addPhoneNumber(const string &phoneNumber) {
     if (std::find(this->_phones.begin(), this->_phones.end(), phoneNumber) != this->_phones.end())
         throw std::runtime_error("Phone number already in card");
     this->_phones.push_back(phoneNumber);
+}
+
+inline void Phonebook::Card::removePhoneNumber(const string &phoneNumber) {
+    std::vector<string>::iterator phoneNumberToRemove = std::find(this->_phones.begin(),
+                                                                  this->_phones.end(), phoneNumber);
+    if (phoneNumberToRemove == this->_phones.end())
+        throw std::runtime_error("No such phone number");
+    this->_phones.erase(phoneNumberToRemove);
 }
 
 inline void verbosePrint(const Phonebook::Card &card) {
